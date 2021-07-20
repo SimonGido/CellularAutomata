@@ -1,0 +1,3 @@
+[submodule "CellularAutomata/vendor/XYZEngine"]
+	path = CellularAutomata/vendor/XYZEngine
+	url = https://github.com/SimonGido/XYZEngine.git
