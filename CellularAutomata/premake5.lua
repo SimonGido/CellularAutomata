@@ -15,9 +15,9 @@ project "CellularAutomata"
 		
 		includedirs
 		{
-			"%{wks.location}/XYZEngine/vendor/yaml-cpp/include",
-			"%{wks.location}/XYZEngine/vendor",
-			"%{wks.location}/XYZEngine/src",
+			"%{wks.location}/XYZEngine/XYZEngine/vendor/yaml-cpp/include",
+			"%{wks.location}/XYZEngine/XYZEngine/vendor",
+			"%{wks.location}/XYZEngine/XYZEngine/src",
 			"%{IncludeDir.ImGui}",
 			"%{IncludeDir.ImGuizmo}",
 			"%{IncludeDir.glm}",
@@ -43,7 +43,7 @@ project "CellularAutomata"
 
 		postbuildcommands 
 		{
-			'{COPY} "../XYZEngine/vendor/mono/bin/Debug/mono-2.0-sgen.dll" "%{cfg.targetdir}"'
+			'{COPY} "../XYZEngine/XYZEngine/vendor/mono/bin/Debug/mono-2.0-sgen.dll" "%{cfg.targetdir}"'
 		}
 		
 		filter "configurations:Release"
@@ -53,5 +53,5 @@ project "CellularAutomata"
 		
 		postbuildcommands 
 		{
-			'{COPY} "../XYZEngine/vendor/mono/bin/Release/mono-2.0-sgen.dll" "%{cfg.targetdir}"'
+			'{COPY} "../XYZEngine/XYZEngine/vendor/mono/bin/Release/mono-2.0-sgen.dll" "%{cfg.targetdir}"'
 		}
