@@ -1,3 +1,4 @@
 [submodule "XYZEngine"]
 	path = XYZEngine
 	url = https://github.com/SimonGido/XYZEngine.git
+	branch = master
