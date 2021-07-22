@@ -16,7 +16,9 @@ static glm::vec2 GetMouseViewportPosition(const XYZ::OrthographicCameraControlle
 GameLayer::GameLayer()
 	:
 	m_CameraController(16.0f / 9.0f),
-	m_MousePosition(0.0f)
+	m_MousePosition(0.0f),
+	m_Pixels(nullptr),
+	m_PixelsDirty(false)
 {
 	auto& app = XYZ::Application::Get();
 	app.GetImGuiLayer()->EnableDockspace(false);
@@ -30,17 +32,14 @@ GameLayer::~GameLayer()
 
 void GameLayer::OnAttach()
 {
-	m_Texture = XYZ::Texture2D::Create(100, 100, 4, {});
+	auto& app = XYZ::Application::Get();
+	m_Texture = XYZ::Texture2D::Create(app.GetWindow().GetWidth(), app.GetWindow().GetHeight(), 4, {});
 	m_Shader = XYZ::Shader::Create("Assets/Shaders/TestShader.glsl");
 
-	uint8_t* pixels = new uint8_t[100 * 100 * 4];
-	memset(pixels, 0, 100 * 100 * sizeof(uint32_t));
-	for (size_t i = 0; i < 100 * 100 * 4; i += 4)
-	{
-		pixels[i]	  = 0xff;
-		pixels[i + 3] = 0xff;
-	}
-	m_Texture->SetData(pixels, 100 * 100 * sizeof(uint32_t));
+	m_Pixels = new uint8_t[m_Texture->GetWidth() * m_Texture->GetHeight() * 4];
+	memset(m_Pixels, 0, m_Texture->GetWidth() * m_Texture->GetHeight() * sizeof(uint32_t));	
+	m_Texture->SetData(m_Pixels, m_Texture->GetWidth() * m_Texture->GetHeight() * sizeof(uint32_t));
+
 
 	XYZ::Renderer::WaitAndRender();
 	XYZ::Renderer::BlockRenderThread();
@@ -54,7 +53,7 @@ void GameLayer::OnUpdate(XYZ::Timestep ts)
 {
 	m_CameraController.OnUpdate(ts);
 	XYZ::Renderer::Clear();
-	XYZ::Renderer::SetClearColor({ 0.0f,0.0f,0.0f,1.0f });
+	XYZ::Renderer::SetClearColor({ 0.1f,0.1f,0.1f,1.0f });
 	
 	m_Shader->Bind();
 	m_Texture->Bind();
@@ -70,6 +69,15 @@ void GameLayer::OnUpdate(XYZ::Timestep ts)
 	m_Timestep = ts;
 	m_RendererStats = XYZ::Renderer2D::GetStats();
 	XYZ::Renderer2D::EndScene();	
+
+	if (XYZ::Input::IsMouseButtonPressed(XYZ::MouseCode::MOUSE_BUTTON_LEFT))
+	{
+		auto& app = XYZ::Application::Get();
+		auto [mx, my] = XYZ::Input::GetMousePosition();
+		my = app.GetWindow().GetHeight() - my;
+		putPixel(mx, my, 0xff, 0, 0, 0xff);
+	}
+	updateTexture();
 }
 void GameLayer::OnEvent(XYZ::Event& event)
 {
@@ -81,7 +89,7 @@ void GameLayer::OnImGuiRender()
 	{
 		ImGui::Text("Performance: ");
 		ImGui::SameLine();
-		ImGui::Text("%f s", m_Timestep);
+		ImGui::Text("%f s", m_Timestep.GetSeconds());
 	
 		ImGui::Text("Quad Drawcalls: ");
 		ImGui::SameLine();
@@ -94,4 +102,28 @@ void GameLayer::OnImGuiRender()
 		m_MousePosition = GetMouseViewportPosition(m_CameraController);
 	}
 	ImGui::End();
+}
+
+void GameLayer::putPixel(uint32_t x, uint32_t y, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+{
+	static constexpr uint32_t channels = 4;
+	if (x < m_Texture->GetWidth() && y < m_Texture->GetHeight())
+	{
+		uint32_t index = (y * m_Texture->GetWidth() * channels) + (x * channels);
+		
+		m_Pixels[index] = r;
+		m_Pixels[index + 1] = g;
+		m_Pixels[index + 2] = b;
+		m_Pixels[index + 3] = a;
+		m_PixelsDirty = true;
+	}
+}
+
+void GameLayer::updateTexture()
+{
+	if (m_PixelsDirty)
+	{
+		m_Texture->SetData(m_Pixels, m_Texture->GetWidth() * m_Texture->GetHeight() * sizeof(uint32_t));
+		m_PixelsDirty = false;
+	}
 }
