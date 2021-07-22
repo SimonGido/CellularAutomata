@@ -75,7 +75,8 @@ void GameLayer::OnUpdate(XYZ::Timestep ts)
 		auto& app = XYZ::Application::Get();
 		auto [mx, my] = XYZ::Input::GetMousePosition();
 		my = app.GetWindow().GetHeight() - my;
-		putPixel(mx, my, 0xff, 0, 0, 0xff);
+		putCircle(mx, my, 0xff, 0, 0, 0xff, 20);
+		//putPixel(mx, my, 0xff, 0, 0, 0xff);
 	}
 	updateTexture();
 }
@@ -116,6 +117,19 @@ void GameLayer::putPixel(uint32_t x, uint32_t y, uint8_t r, uint8_t g, uint8_t b
 		m_Pixels[index + 2] = b;
 		m_Pixels[index + 3] = a;
 		m_PixelsDirty = true;
+	}
+}
+
+void GameLayer::putCircle(uint32_t x, uint32_t y, uint8_t r, uint8_t g, uint8_t b, uint8_t a, uint32_t radius)
+{
+	uint32_t halfRadius = radius / 2;
+	for (uint32_t i = x - halfRadius; i < x + halfRadius; ++i)
+	{
+		for (uint32_t j = y - halfRadius; j < y + halfRadius; ++j)
+		{
+			if (glm::distance(glm::vec2{ i, j }, glm::vec2{ x, y }) < (float)radius / 2.0f)
+				putPixel(i, j, r, g, b, a);
+		}
 	}
 }
 

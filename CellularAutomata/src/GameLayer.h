@@ -17,6 +17,7 @@ public:
 
 private:
 	void putPixel(uint32_t x, uint32_t y, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+	void putCircle(uint32_t x, uint32_t y, uint8_t r, uint8_t g, uint8_t b, uint8_t a, uint32_t radius);
 	void updateTexture();
 
 private:
