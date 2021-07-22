@@ -84,16 +84,9 @@ void GameLayer::OnUpdate(XYZ::Timestep ts)
 	m_RendererStats = XYZ::Renderer2D::GetStats();
 	XYZ::Renderer2D::EndScene();	
 	auto [xCoord, yCoord] = WorldPositionToGridCoords(m_MousePosition, 1, 1, glm::vec2(1.0f / 512.0f, 1.0f / 512.0f), glm::vec2(-1.0f));
-	std::cout << xCoord << "  " << yCoord << std::endl;
 	if (XYZ::Input::IsMouseButtonPressed(XYZ::MouseCode::MOUSE_BUTTON_LEFT))
 	{
-		auto& app = XYZ::Application::Get();
-		auto [mx, my] = XYZ::Input::GetMousePosition();
-		my = app.GetWindow().GetHeight() - my;
-		
-		
-		//putCircle(mx, my, 0xff, 0, 0, 0xff, 20);
-		putPixel(xCoord, yCoord, 0xff, 0, 0, 0xff);
+		putCircle(xCoord, yCoord, 0xff, 0, 0, 0xff, 20);
 	}
 	updateTexture();
 }
