@@ -2,11 +2,6 @@
 
 #include <XYZ.h>
 
-struct IVec2
-{
-	uint32_t X, Y;
-};
-
 struct Pixel
 {
 	uint8_t R, G, B, A;
@@ -15,7 +10,7 @@ struct Pixel
 class Chunk
 {
 public:
-	static constexpr IVec2 sc_ChunkSize = { 512, 512 };
+	static constexpr glm::ivec2 sc_ChunkSize = { 32, 32 };
 
 public:
 	Chunk(const glm::vec2& position);

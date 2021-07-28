@@ -4,7 +4,7 @@ Chunk::Chunk(const glm::vec2& position)
 	:
 	m_Position(position)
 {
-	m_Texture = XYZ::Texture2D::Create(sc_ChunkSize.X, sc_ChunkSize.Y, 4, {});
+	m_Texture = XYZ::Texture2D::Create(sc_ChunkSize.x, sc_ChunkSize.y, 4, {});
 
 	m_Pixels = new Pixel[m_Texture->GetWidth() * m_Texture->GetHeight()];
 	memset(m_Pixels, 255, m_Texture->GetWidth() * m_Texture->GetHeight() * sizeof(Pixel));
@@ -33,7 +33,6 @@ void Chunk::Render()
 
 void Chunk::SetPixel(uint32_t x, uint32_t y, Pixel pixel)
 {	
-	static constexpr uint32_t channels = 4;
 	if (x < m_Texture->GetWidth() && y < m_Texture->GetHeight())
 	{
 		uint32_t index = (y * m_Texture->GetWidth()) + x;

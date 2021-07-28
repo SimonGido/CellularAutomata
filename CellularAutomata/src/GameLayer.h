@@ -2,7 +2,7 @@
 
 #include <XYZ.h>
 
-#include "CellularAutomata/Chunk.h"
+#include "CellularAutomata/World.h"
 
 
 class GameLayer : public XYZ::Layer
@@ -23,7 +23,6 @@ private:
 private:
 	XYZ::OrthographicCameraController m_CameraController;
 	glm::vec2						  m_MousePosition;
-
-	Chunk m_Chunks[4];
+	World							  m_World;
 };
 

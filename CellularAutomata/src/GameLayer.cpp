@@ -13,27 +13,10 @@ static glm::vec2 GetMouseViewportPosition(const XYZ::OrthographicCameraControlle
 	return { pos.x + x, pos.y + y };
 }
 
-static std::pair<int32_t, int32_t> WorldPositionToGridCoords(const glm::vec2& pos, uint32_t width, uint32_t height, const glm::vec2& cellSize, const glm::vec2& center)
-{
-	glm::vec2 leftBottom = center - glm::vec2(width, height) / 2.0f;
-	glm::vec2 coords = pos - leftBottom;
-
-	return {
-		(int32_t)(std::floor(coords.x / cellSize.x)),
-		(int32_t)(std::floor(coords.y / cellSize.y))
-	};
-}
-
 GameLayer::GameLayer()
 	:
 	m_CameraController(16.0f / 9.0f),
-	m_MousePosition(0.0f),
-	m_Chunks{
-		Chunk(glm::vec2(-0.5f)),
-		Chunk(glm::vec2(-0.5f, 0.5f)),
-		Chunk(glm::vec2(0.5f)),
-		Chunk(glm::vec2(0.5f, -0.5f))
-	}
+	m_MousePosition(0.0f)
 {
 	auto& app = XYZ::Application::Get();
 	app.GetImGuiLayer()->EnableDockspace(false);
@@ -60,32 +43,10 @@ void GameLayer::OnUpdate(XYZ::Timestep ts)
 {
 	m_MousePosition = GetMouseViewportPosition(m_CameraController);
 	m_CameraController.OnUpdate(ts);
-	XYZ::Renderer::Clear();
-	XYZ::Renderer::SetClearColor({ 0.1f,0.1f,0.1f,1.0f });
-	
-
-	XYZ::Renderer2D::BeginScene(m_CameraController.GetCamera().GetViewProjectionMatrix(), m_CameraController.GetCamera().GetPosition());
-	XYZ::Renderer2D::SubmitCircle(glm::vec3(m_MousePosition, 0.0f), 0.1f, 10);
-
-	for (size_t i = 0; i < 4; ++i)
-		m_Chunks[i].Render();
-
-	XYZ::Renderer2D::Flush();
-	XYZ::Renderer2D::FlushLines();
+	m_World.Update(m_MousePosition);
+	m_World.Render(m_CameraController.GetCamera());
 	
 	m_MousePosition = GetMouseViewportPosition(m_CameraController);
-	XYZ::Renderer2D::EndScene();	
-	
-	if (XYZ::Input::IsMouseButtonPressed(XYZ::MouseCode::MOUSE_BUTTON_LEFT))
-	{
-		glm::vec2 cellSize = { 1.0f / (float)Chunk::sc_ChunkSize.X, 1.0f / (float)Chunk::sc_ChunkSize.Y };
-		for (size_t i = 0; i < 4; ++i)
-		{
-			auto [xCoord, yCoord] = WorldPositionToGridCoords(m_MousePosition, 1, 1, cellSize, m_Chunks[i].GetPosition());
-			if (xCoord >= 0 && yCoord >= 0)
-				m_Chunks[i].SetCircle(xCoord, yCoord, 10, { 255, 0, 0, 255 });
-		}
-	}
 }
 void GameLayer::OnEvent(XYZ::Event& event)
 {
@@ -95,8 +56,6 @@ void GameLayer::OnImGuiRender()
 {
 	displayStats();
 }
-
-
 
 void GameLayer::displayStats()
 {
